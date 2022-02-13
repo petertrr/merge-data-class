@@ -1,26 +1,29 @@
 plugins {
+    id("java-gradle-plugin")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.buildconfig)
 }
 
 dependencies {
-//    compileOnly("org.jetbrains.kotlin:kotlin-compiler")
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable")
-    testImplementation(kotlin("test-junit5"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.7")
+    implementation(kotlin("gradle-plugin-api"))
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-// todo: share logic between subprojects
 buildConfig {
+    val project = project(":kotlin-plugin")
     packageName(project.group.toString())
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${pluginConfig.pluginId}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project.name}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
+}
+
+gradlePlugin {
+    plugins {
+        create("kotlinIrPluginTemplate") {
+            id = pluginConfig.pluginId
+            displayName = "merge-data-class Kotlin Compiler Plugin"
+            description = "merge-data-class Kotlin Compiler Plugin"
+            implementationClass = "io.github.petertrr.plugin.MergeDataClassGradlePlugin"
+        }
+    }
 }
