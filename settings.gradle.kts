@@ -1,2 +1,15 @@
 rootProject.name = "merge-data-class"
-include("kotlin-plugin")
+include("merge-data-class-annotations")
+include("merge-data-class-ksp")
+
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}

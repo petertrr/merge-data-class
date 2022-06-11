@@ -1,0 +1,12 @@
+[versions]
+kotlin = "1.6.21"
+ksp = "1.6.21-1.0.6"
+kotlinpoet = "1.11.0"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+[libraries]
+ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
+square-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
