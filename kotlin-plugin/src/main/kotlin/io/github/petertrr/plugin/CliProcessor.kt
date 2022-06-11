@@ -6,5 +6,5 @@ import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 
 class CliProcessor(override val pluginId: String = BuildConfig.KOTLIN_PLUGIN_ID) : CommandLineProcessor {
     override val pluginOptions: Collection<AbstractCliOption>
-        get() = TODO("Not yet implemented")
+        get() = emptyList()
 }
