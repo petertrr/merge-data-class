@@ -2,11 +2,18 @@
 kotlin = "1.6.21"
 ksp = "1.6.21-1.0.6"
 kotlinpoet = "1.11.0"
+junit = "5.8.2"
+kotest = "5.3.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [libraries]
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 square-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+tschuchortdev-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version = "1.4.8" }
+tschuchortdev-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version = "1.4.8" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
