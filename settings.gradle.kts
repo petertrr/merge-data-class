@@ -1,3 +1,5 @@
+import org.gradle.api.internal.FeaturePreviews.Feature
+
 rootProject.name = "merge-data-class"
 include("merge-data-class-annotations")
 include("merge-data-class-ksp")
@@ -13,3 +15,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
+
+enableFeaturePreview(Feature.TYPESAFE_PROJECT_ACCESSORS.name)

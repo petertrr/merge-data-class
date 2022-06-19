@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-    compileOnly(projects.mergeDataClassAnnotations)
+    compileOnly(project(":merge-data-class-annotations", "jvmArchive"))
     implementation(libs.ksp.api)
     implementation(libs.square.kotlinpoet)
 
