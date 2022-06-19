@@ -1,6 +1,7 @@
 import org.gradle.api.internal.FeaturePreviews.Feature
 
 rootProject.name = "merge-data-class"
+includeBuild("build-logic")
 include("merge-data-class-annotations")
 include("merge-data-class-ksp")
 

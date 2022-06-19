@@ -1,0 +1,20 @@
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+
+jobs:
+  build_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: |
+            publishAllPublicationsToGithubPackagesRepository
+            -Pgpr.user=${{ env.USER }}
+            -Pgpr.key=${{ secrets.GITHUB_TOKEN }}

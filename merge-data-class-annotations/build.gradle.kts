@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
+    kotlin("multiplatform")
+    id("convention.maven-publishing")
 }
 
 kotlin {

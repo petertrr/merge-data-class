@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
     alias(libs.plugins.ksp)
+    id("convention.maven-publishing")
 }
 
 dependencies {
@@ -20,4 +21,19 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "${project.group}"
+            artifactId = project.name
+            version = version
+            from(components["java"])
+        }
+    }
 }

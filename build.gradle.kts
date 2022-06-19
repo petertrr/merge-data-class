@@ -1,2 +1,3 @@
-group = "io.github.petertrr"
-version = "0.1.0-SNAPSHOT"
+plugins {
+    alias(libs.plugins.kotlin.jvm) apply false
+}
