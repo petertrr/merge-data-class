@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("convention.maven-publishing")
+    id("convention.code-style")
 }
 
 kotlin {
