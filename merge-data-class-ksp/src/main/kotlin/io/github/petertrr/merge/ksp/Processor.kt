@@ -6,14 +6,17 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.TypeSpec
 import io.github.petertrr.merge.ksp.generators.copyParametersAsNullable
 import io.github.petertrr.merge.ksp.generators.createMergeMethod
 import io.github.petertrr.plugin.BuildFromPartial
 
 class Processor(
     environment: SymbolProcessorEnvironment
-): SymbolProcessor {
+) : SymbolProcessor {
     private val codeGenerator = environment.codeGenerator
     private val logger = environment.logger
 
@@ -58,7 +61,10 @@ class Processor(
                 val text = generatedFileSpec.build()
 
                 codeGenerator.createNewFile(
-                    dependencies = Dependencies(aggregating = true, sources = arrayOf(ksClassDeclaration.containingFile!!)),
+                    dependencies = Dependencies(
+                        aggregating = true,
+                        sources = arrayOf(ksClassDeclaration.containingFile!!)
+                    ),
                     packageName = packageName,
                     fileName = generatedFileSpec.name,
                 ).bufferedWriter().use {

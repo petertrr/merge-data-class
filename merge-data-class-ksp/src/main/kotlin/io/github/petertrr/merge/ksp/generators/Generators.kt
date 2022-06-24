@@ -2,7 +2,11 @@ package io.github.petertrr.merge.ksp.generators
 
 import com.google.devtools.ksp.symbol.KSClassifierReference
 import com.google.devtools.ksp.symbol.KSValueParameter
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
 import io.github.petertrr.merge.ksp.Descriptor
 
 internal fun TypeSpec.Builder.copyParametersAsNullable(
@@ -52,7 +56,9 @@ internal fun TypeSpec.Builder.createMergeMethod(
             append("$name ?: other.$name")
             if (!isNullable) {
                 // Non-breaking spaces because of https://square.github.io/kotlinpoet/#spaces-wrap-by-default
-                append(" ?: error(\"Property·$name·is·null·on·both·arguments,·but·is·non-nullable·in·class·${originalClassName.canonicalName}\")")
+                append(
+                    " ?: error(\"Property·$name·is·null·on·both·arguments,·but·is·non-nullable·in·class·${originalClassName.canonicalName}\")"
+                )
             }
         }
     }
@@ -63,11 +69,13 @@ internal fun TypeSpec.Builder.createMergeMethod(
                 ParameterSpec("other", newClassName)
             )
             .returns(originalClassName)
-            .addCode("""
+            .addCode(
+                """
                     return ${originalClassName.simpleName}(
                         $params
                     )
-                """.trimIndent())
+                """.trimIndent()
+            )
             .build()
     )
     return this

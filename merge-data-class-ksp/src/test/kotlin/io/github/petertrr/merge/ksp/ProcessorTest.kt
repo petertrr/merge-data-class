@@ -1,6 +1,10 @@
 package io.github.petertrr.merge.ksp
 
-import com.tschuchort.compiletesting.*
+import com.tschuchort.compiletesting.KotlinCompilation
+import com.tschuchort.compiletesting.SourceFile
+import com.tschuchort.compiletesting.kspIncremental
+import com.tschuchort.compiletesting.kspSourcesDir
+import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.petertrr.plugin.BuildFromPartial
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
@@ -11,8 +15,9 @@ import java.io.File
 class ProcessorTest {
     @Test
     fun `simple test`() {
-        val source = SourceFile.kotlin("Example.kt",
-        """
+        val source = SourceFile.kotlin(
+            "Example.kt",
+            """
             package com.example
             
             import ${BuildFromPartial::class.qualifiedName}
@@ -22,7 +27,7 @@ class ProcessorTest {
                 val foo: Int,
                 val bar: String?,
             )
-        """.trimIndent(),
+            """.trimIndent(),
         )
 
         val compilation = KotlinCompilation().apply {
@@ -36,7 +41,8 @@ class ProcessorTest {
         result.exitCode shouldBe KotlinCompilation.ExitCode.OK
 
         val generatedSourcesDir = compilation.kspSourcesDir
-        val generatedFile = File(generatedSourcesDir,
+        val generatedFile = File(
+            generatedSourcesDir,
             "kotlin/com/example/ExamplePartial.kt"
         )
         @Language("kotlin") val expected = """
