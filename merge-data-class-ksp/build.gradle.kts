@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     alias(libs.plugins.ksp)
     id("convention.maven-publishing")
+    id("convention.code-style")
 }
 
 dependencies {
