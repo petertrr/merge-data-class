@@ -14,8 +14,6 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           arguments: |
-            build
-            -x spotlessCheck
-            -x detekt
-            -Pdetekt.multiplatform.disabled=true
+            spotlessCheck
+            detekt
             --build-cache
