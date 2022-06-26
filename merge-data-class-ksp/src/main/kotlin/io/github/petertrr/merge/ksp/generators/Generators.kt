@@ -2,7 +2,13 @@ package io.github.petertrr.merge.ksp.generators
 
 import com.google.devtools.ksp.symbol.KSClassifierReference
 import com.google.devtools.ksp.symbol.KSValueParameter
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.TypeVariableName
 import io.github.petertrr.merge.ksp.Descriptor
 
 internal fun TypeSpec.Builder.copyParametersAsNullable(
@@ -59,7 +65,7 @@ internal fun TypeSpec.Builder.createMergeMethod(
     originalClassName: ClassName,
     newClassName: ClassName,
 ): TypeSpec.Builder {
-    val params = descriptor.properties.joinToString(separator = ",\n") {
+    val params = descriptor.properties.joinToString(separator = ",\n", postfix = ",") {
         val name = it.name!!.asString()
         val isNullable = it.type.resolve().isMarkedNullable
         buildString {
