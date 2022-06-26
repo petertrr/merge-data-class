@@ -45,11 +45,11 @@ data class FooPartial(
 This plugin can be used as any other KSP processor: apply the KSP plugin and add required dependencies:
 ```kotlin
 plugins{
-    kotlin("ksp") version "1.6.21"
+    id("com.google.devtools.ksp") version <ksp version>
 }
 
 dependencies {
-    compileOnly("io.github.petertrr:merge-data-class-annotations:0.1.0")
-    ksp("io.github.petertrr:merge-data-class-ksp:0.1.0")
+    implementation("io.github.petertrr.ksp:merge-data-class-annotations:0.1.0")
+    ksp("io.github.petertrr.ksp:merge-data-class-ksp:0.1.0")
 }
 ```

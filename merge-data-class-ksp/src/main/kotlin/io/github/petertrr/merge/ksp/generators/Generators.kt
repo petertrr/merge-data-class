@@ -1,9 +1,12 @@
 package io.github.petertrr.merge.ksp.generators
 
 import com.google.devtools.ksp.symbol.KSClassifierReference
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.*
 import io.github.petertrr.merge.ksp.Descriptor
+import io.github.petertrr.merge.ksp.KspEnvironmentContext
+import io.github.petertrr.plugin.MergeStrategy
 
 internal fun TypeSpec.Builder.copyParametersAsNullable(
     ctorBuilder: FunSpec.Builder,
@@ -54,16 +57,29 @@ internal fun TypeSpec.Builder.copyParametersAsNullable(
     return this
 }
 
+context(KspEnvironmentContext)
 internal fun TypeSpec.Builder.createMergeMethod(
     descriptor: Descriptor,
     originalClassName: ClassName,
     newClassName: ClassName,
 ): TypeSpec.Builder {
-    val params = descriptor.properties.joinToString(separator = ",\n") {
-        val name = it.name!!.asString()
-        val isNullable = it.type.resolve().isMarkedNullable
+    val params = descriptor.properties.joinToString(separator = ",\n") { parameter ->
+        val name = parameter.name!!.asString()
+        val isNullable = parameter.type.resolve().isMarkedNullable
+        val mergeStrategy = descriptor.customMergeStrategies[parameter]
         buildString {
-            append("$name ?: other.$name")
+            if (mergeStrategy != null) {
+                logger.info("Using custom merging strategy on property $name")
+                val mergeStrategyInstanceName = mergeStrategy.arguments
+                    .find { it.name?.asString() == "with" }!!
+                    .value
+                    .toString()
+                    .replaceFirstChar { it.lowercase() }
+                append("if ($name != null && other.$name != null) $mergeStrategyInstanceName.merge($name, other.$name) as ${parameter.type.resolve().declaration.qualifiedName?.asString()}<${parameter.type.resolve().declaration.typeParameters.map { it.name.asString() }}> " +
+                        "else $name ?: other.$name")
+            } else {
+                append("$name ?: other.$name")
+            }
             if (!isNullable) {
                 // Non-breaking spaces because of https://square.github.io/kotlinpoet/#spaces-wrap-by-default
                 append(

@@ -22,6 +22,7 @@ kotlin {
     mingwX64()
 }
 
+// to add project dependency to other subprojects
 val jvmArchive by configurations.creating
 val jvmJar by tasks.getting
 artifacts.add(jvmArchive.name, jvmJar)

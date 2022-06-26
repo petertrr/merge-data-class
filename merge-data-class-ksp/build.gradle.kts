@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
     alias(libs.plugins.ksp)
@@ -22,6 +24,11 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+    }
 }
 
 java {

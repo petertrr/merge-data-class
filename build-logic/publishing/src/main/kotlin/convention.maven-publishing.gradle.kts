@@ -15,6 +15,7 @@ publishing {
     }
     publications {
         publications.withType<MavenPublication>().configureEach {
+            logger.info("The following publication is getting configured: project ${project.path}, publication ${this.name}")
             this.pom {
                 name.set(rootProject.name)
                 url.set("https://github.com/petertrr/merge-data-class")
