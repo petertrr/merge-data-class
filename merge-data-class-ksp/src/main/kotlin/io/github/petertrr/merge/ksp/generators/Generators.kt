@@ -2,11 +2,7 @@ package io.github.petertrr.merge.ksp.generators
 
 import com.google.devtools.ksp.symbol.KSClassifierReference
 import com.google.devtools.ksp.symbol.KSValueParameter
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.*
 import io.github.petertrr.merge.ksp.Descriptor
 
 internal fun TypeSpec.Builder.copyParametersAsNullable(
@@ -16,26 +12,40 @@ internal fun TypeSpec.Builder.copyParametersAsNullable(
     parameters.forEach { originalParameter ->
         val type = originalParameter.type
         val resolvedType = originalParameter.type.resolve()
-        val typeName = ClassName(
+        val className = ClassName(
             resolvedType.declaration.packageName.asString(),
             resolvedType.declaration.simpleName.asString(),
         )
+            .copy(nullable = true)
+        val typeName = if (resolvedType.arguments.isNotEmpty()) {
+            with(ParameterizedTypeName.Companion) {
+                (className as ClassName).parameterizedBy(
+                    typeArguments = resolvedType.arguments.map {
+                        TypeVariableName.Companion.invoke(it.type.toString())
+                    }
+                )
+            }
+        } else {
+            className
+        }
+            .copy(nullable = true)
+
         val originalParameterName = originalParameter.name!!.asString()
         if (type is KSClassifierReference && resolvedType.isMarkedNullable) {
             ctorBuilder.addParameter(
                 name = originalParameterName,
-                type = typeName.copy(nullable = true),
+                type = typeName,
             )
         } else {
             ctorBuilder.addParameter(
                 name = originalParameterName,
-                type = typeName.copy(nullable = true),
+                type = typeName,
             )
         }
 
         // Parameters need to be duplicated as properties for kotlinpoet to merge them into a primary constructor: https://square.github.io/kotlinpoet/#constructors.
         addProperty(
-            PropertySpec.builder(originalParameterName, typeName.copy(nullable = true))
+            PropertySpec.builder(originalParameterName, typeName)
                 .initializer(originalParameterName)
                 .build()
         )
