@@ -26,6 +26,7 @@ class ProcessorTest {
             data class Example(
                 val foo: Int,
                 val bar: String?,
+                val baz: List<String>,
             )
             """.trimIndent(),
         )
@@ -50,16 +51,20 @@ class ProcessorTest {
             |
             |import kotlin.Int
             |import kotlin.String
+            |import kotlin.collections.List
             |
             |public class ExamplePartial(
             |  public val foo: Int?,
             |  public val bar: String?,
+            |  public val baz: List<String>?,
             |) {
             |  public fun merge(other: ExamplePartial): Example {
             |                        return Example(
             |                            foo ?: other.foo ?:
             |        error("Property foo is null on both arguments, but is non-nullable in class com.example.Example"),
-            |    bar ?: other.bar
+            |    bar ?: other.bar,
+            |    baz ?: other.baz ?:
+            |        error("Property baz is null on both arguments, but is non-nullable in class com.example.Example"),
             |                        )
             |  }
             |}
