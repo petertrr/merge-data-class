@@ -13,7 +13,7 @@ spotless {
 }
 
 detekt {
-    config = files("$rootDir/config/detekt/detekt.yml")
+    config = files("$rootDir/gradle/config/detekt/detekt.yml")
     buildUponDefaultConfig = true
 }
 
