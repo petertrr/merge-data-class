@@ -13,6 +13,7 @@ spotless {
 }
 
 detekt {
-
+    config = files("$rootDir/config/detekt/detekt.yml")
+    buildUponDefaultConfig = true
 }
 
