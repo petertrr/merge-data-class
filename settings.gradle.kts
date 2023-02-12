@@ -1,5 +1,12 @@
 import org.gradle.api.internal.FeaturePreviews.Feature
 
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     id("com.gradle.enterprise") version "3.12.3"
 }
@@ -9,12 +16,6 @@ includeBuild("gradle/build-logic")
 include("merge-data-class-annotations")
 include("merge-data-class-ksp")
 
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
