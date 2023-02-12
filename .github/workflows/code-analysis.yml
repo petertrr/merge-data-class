@@ -18,4 +18,4 @@ jobs:
             spotlessCheck
             detekt
             --build-cache
-            --build-scan
+            --scan

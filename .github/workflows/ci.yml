@@ -20,4 +20,4 @@ jobs:
             -x detekt
             -Pdetekt.multiplatform.disabled=true
             --build-cache
-            --build-scan
+            --scan

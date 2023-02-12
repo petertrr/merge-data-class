@@ -20,4 +20,4 @@ jobs:
             -Pgpr.user=${{ env.USER }}
             -Pgpr.key=${{ secrets.GITHUB_TOKEN }}
             --build-cache
-            --build-scan
+            --scan
