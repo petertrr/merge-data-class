@@ -14,6 +14,7 @@ import java.io.File
 
 class ProcessorTest {
     @Test
+    @Suppress("LongMethod")
     fun `simple test`() {
         val source = SourceFile.kotlin(
             "Example.kt",
