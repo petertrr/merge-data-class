@@ -1,6 +1,9 @@
 package io.github.petertrr.merge.ksp.generators
 
+import com.google.devtools.ksp.symbol.ClassKind
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSClassifierReference
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FunSpec
@@ -10,6 +13,8 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
 import io.github.petertrr.merge.ksp.Descriptor
+import io.github.petertrr.plugin.MergeStrategy
+import io.github.petertrr.plugin.WithStrategy
 
 internal fun TypeSpec.Builder.copyParametersAsNullable(
     ctorBuilder: FunSpec.Builder,
@@ -65,11 +70,24 @@ internal fun TypeSpec.Builder.createMergeMethod(
     originalClassName: ClassName,
     newClassName: ClassName,
 ): TypeSpec.Builder {
-    val params = descriptor.properties.joinToString(separator = ",\n", postfix = ",") {
-        val name = it.name!!.asString()
-        val isNullable = it.type.resolve().isMarkedNullable
+    val params = descriptor.properties.joinToString(separator = ",\n", postfix = ",") { parameter ->
+        val name = parameter.name!!.asString()
+        val isNullable = parameter.type.resolve().isMarkedNullable
+        val shouldBeMerged = parameter.annotations.filter { annotation ->
+            annotation.shortName.getShortName() == WithStrategy::class.simpleName
+        }.any { annotation ->
+            val strategyArgument = annotation.arguments.firstOrNull {
+                it.name?.getShortName() == WithStrategy::strategy.name
+            }
+            val classDeclaration = ((strategyArgument?.value as? KSType)?.declaration as? KSClassDeclaration)
+            classDeclaration?.classKind == ClassKind.ENUM_ENTRY && classDeclaration.simpleName.asString() == MergeStrategy.MERGE_COLLECTION.name
+        }
         buildString {
-            append("$name ?: other.$name")
+            if (shouldBeMerged) {
+                append("$name?.run { other.$name?.let { plus(it) } ?: this } ?: other.$name")
+            } else {
+                append("$name ?: other.$name")
+            }
             if (!isNullable) {
                 // Non-breaking spaces because of https://square.github.io/kotlinpoet/#spaces-wrap-by-default
                 append(
