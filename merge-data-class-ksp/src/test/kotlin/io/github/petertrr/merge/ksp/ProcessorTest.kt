@@ -14,40 +14,21 @@ import java.io.File
 
 class ProcessorTest {
     @Test
-    @Suppress("LongMethod")
     fun `simple test`() {
-        val source = SourceFile.kotlin(
-            "Example.kt",
-            """
-            package com.example
-            
-            import ${BuildFromPartial::class.qualifiedName}
-
-            @BuildFromPartial
-            data class Example(
-                val foo: Int,
-                val bar: String?,
-                val baz: List<String>,
-            )
-            """.trimIndent(),
-        )
-
-        val compilation = KotlinCompilation().apply {
-            sources = listOf(source)
-            inheritClassPath = true
-            symbolProcessorProviders = listOf(ProcessorProvider())
-            kspIncremental = true
-        }
-        val result = compilation.compile()
-
-        result.exitCode shouldBe KotlinCompilation.ExitCode.OK
-
-        val generatedSourcesDir = compilation.kspSourcesDir
-        val generatedFile = File(
-            generatedSourcesDir,
-            "kotlin/com/example/ExamplePartial.kt"
-        )
-        @Language("kotlin") val expected = """
+        generateCodeFromAndCompare(
+            source = """
+            |package com.example
+            |
+            |import ${BuildFromPartial::class.qualifiedName}
+            |
+            |@BuildFromPartial
+            |data class Example(
+            |    val foo: Int,
+            |    val bar: String?,
+            |    val baz: List<String>,
+            |)
+            """.trimMargin(),
+            expectedGeneratedSource = """
             |package com.example
             |
             |import kotlin.Int
@@ -70,18 +51,46 @@ class ProcessorTest {
             |  }
             |}
             |
-        """.trimMargin()
-
-        generatedFile.shouldExist()
-        generatedFile.readText() shouldBe expected
-
-        // Checking that the generated file can be compiled as well.
-        val secondCompilation = KotlinCompilation().apply {
-            sources = listOf(source, SourceFile.fromPath(generatedFile))
-            inheritClassPath = true
-        }
-        val secondResult = secondCompilation.compile()
-
-        secondResult.exitCode shouldBe KotlinCompilation.ExitCode.OK
+            """.trimMargin(),
+        )
     }
+}
+
+private fun generateCodeFromAndCompare(
+    @Language("kotlin") source: String,
+    @Language("kotlin") expectedGeneratedSource: String,
+): KotlinCompilation {
+    val fileBaseName = "Test"
+    // fixme: class name is taken from [source]
+    val classBaseName = "Example"
+    val sourceFile = SourceFile.kotlin("$fileBaseName.kt", source)
+    val compilation = KotlinCompilation().apply {
+        sources = listOf(sourceFile)
+        inheritClassPath = true
+        symbolProcessorProviders = listOf(ProcessorProvider())
+        kspIncremental = true
+    }
+    val result = compilation.compile()
+
+    result.exitCode shouldBe KotlinCompilation.ExitCode.OK
+
+    val generatedSourcesDir = compilation.kspSourcesDir
+    val generatedFile = File(
+        generatedSourcesDir,
+        "kotlin/com/example/${classBaseName}Partial.kt"
+    )
+
+    generatedFile.shouldExist()
+    generatedFile.readText() shouldBe expectedGeneratedSource
+
+    // Checking that the generated file can be compiled as well.
+    val secondCompilation = KotlinCompilation().apply {
+        sources = compilation.sources + SourceFile.fromPath(generatedFile)
+        inheritClassPath = true
+    }
+    val secondResult = secondCompilation.compile()
+
+    secondResult.exitCode shouldBe KotlinCompilation.ExitCode.OK
+
+    return compilation
 }
