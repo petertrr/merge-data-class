@@ -25,6 +25,8 @@ class Processor(
             .filterIsInstance<KSClassDeclaration>()
             .filterNot { it.primaryConstructor == null }
             .forEach { ksClassDeclaration ->
+                logger.info("Processing class annotated with `@$BUILD_FROM_PARTIAL_ANNOTATION_NAME`", ksClassDeclaration)
+
                 val packageName = ksClassDeclaration.packageName.asString()
                 val originalClassName = ksClassDeclaration.simpleName.asString()
                 val partialClassName = ClassName(
@@ -60,6 +62,7 @@ class Processor(
                 )
                 val text = generatedFileSpec.build()
 
+                logger.info("Writing generated code into ${generatedFileSpec.name}")
                 codeGenerator.createNewFile(
                     dependencies = Dependencies(
                         aggregating = true,

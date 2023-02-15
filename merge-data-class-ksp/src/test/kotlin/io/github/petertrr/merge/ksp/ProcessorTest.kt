@@ -6,6 +6,8 @@ import com.tschuchort.compiletesting.kspIncremental
 import com.tschuchort.compiletesting.kspSourcesDir
 import com.tschuchort.compiletesting.symbolProcessorProviders
 import io.github.petertrr.plugin.BuildFromPartial
+import io.github.petertrr.plugin.MergeStrategy
+import io.github.petertrr.plugin.WithStrategy
 import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.shouldBe
 import org.intellij.lang.annotations.Language
@@ -20,11 +22,14 @@ class ProcessorTest {
             |package com.example
             |
             |import ${BuildFromPartial::class.qualifiedName}
+            |import ${WithStrategy::class.qualifiedName}
+            |import ${MergeStrategy::class.qualifiedName}
             |
             |@BuildFromPartial
             |data class Example(
             |    val foo: Int,
             |    val bar: String?,
+            |    @WithStrategy(strategy = MergeStrategy.MERGE_COLLECTION)
             |    val baz: List<String>,
             |)
             """.trimMargin(),
@@ -45,7 +50,7 @@ class ProcessorTest {
             |                            foo ?: other.foo ?:
             |        error("Property foo is null on both arguments, but is non-nullable in class com.example.Example"),
             |    bar ?: other.bar,
-            |    baz ?: other.baz ?:
+            |    baz?.run { other.baz?.let { plus(it) } ?: this } ?: other.baz ?:
             |        error("Property baz is null on both arguments, but is non-nullable in class com.example.Example"),
             |                        )
             |  }
